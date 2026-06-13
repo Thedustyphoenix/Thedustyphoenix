@@ -1,0 +1,6 @@
+{
+  "name": "The Dusty Phoenix",
+  "description": "An elegant showcase, gallery, and store directory for The Dusty Phoenix arts, crafts, whimsical gnomes, and holiday decorations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

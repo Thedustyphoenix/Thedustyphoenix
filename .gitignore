@@ -1,0 +1,13 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+deployment_error_log.txt
+*.txt
+deploy.bat
+deploy.sh
+upload.js
+.env*
+!.env.example
