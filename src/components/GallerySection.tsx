@@ -261,7 +261,7 @@ export default function GallerySection() {
   };
 
   return (
-    <section id="gallery" className="py-6 bg-purple-100/15 relative overflow-hidden">
+    <section id="gallery" className="py-6 bg-transparent relative overflow-hidden">
       {/* Structural visual frame */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-purple-200/10 pointer-events-none" />
       <div className="absolute top-1/2 left-10 w-96 h-96 bg-purple-200/10 rounded-full blur-3xl pointer-events-none" />

@@ -51,7 +51,7 @@ export default function AboutSection() {
   };
 
   return (
-    <section id="studio-desk" className="relative py-6 bg-purple-100/5 overflow-hidden">
+    <section id="studio-desk" className="relative py-6 bg-transparent overflow-hidden">
       {/* Decorative Warm Backdrops */}
       <div className="absolute top-1/2 left-0 w-72 h-72 bg-purple-200/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-100/10 rounded-full blur-3xl pointer-events-none" />
