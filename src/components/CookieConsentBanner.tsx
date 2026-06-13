@@ -183,41 +183,15 @@ export default function CookieConsentBanner({
   return (
     <AnimatePresence>
       {showBanner && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 overflow-y-auto">
-          {/* Backdrop overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-purple-950/85 backdrop-blur-xl cursor-not-allowed"
-            id="cookie-consent-backdrop"
-          />
+        <div className="fixed bottom-4 right-4 z-50 w-[calc(100%-2rem)] max-w-md" id="cookie-consent-container">
           
-          {/* Logo container above the banner */}
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: -15 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: -15 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 125 }}
-            className="z-50 mb-4 flex flex-shrink-0 justify-center select-none"
-            id="cookie-consent-logo-container"
-          >
-            <img 
-              src={LOGO_IMAGE} 
-              alt="thedustyphoenix logo" 
-              className="w-20 h-20 sm:w-24 sm:h-24 object-contain filter drop-shadow-[0_8px_16px_rgba(107,33,168,0.35)] select-none brightness-110"
-              referrerPolicy="no-referrer"
-            />
-          </motion.div>
-          
-          {/* Center-aligned Modal Banner */}
+          {/* Bottom-right aligned Banner Widget */}
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 125 }}
-            className="relative w-full max-w-lg bg-white/95 backdrop-blur-md border border-purple-200/90 rounded-2xl shadow-2xl overflow-hidden font-sans text-purple-950 z-50 my-auto"
+            className="relative w-full bg-white/95 backdrop-blur-md border border-purple-200/90 rounded-2xl shadow-2xl overflow-hidden font-sans text-purple-950"
             id="cookie-consent-widget"
           >
             <div className="p-5 md:p-6 space-y-4">
