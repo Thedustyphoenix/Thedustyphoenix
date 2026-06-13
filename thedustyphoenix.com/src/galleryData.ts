@@ -39,7 +39,7 @@ import { GalleryItem } from './types';
 export const LOCAL_GALLERY_ITEMS: GalleryItem[] = [
   {
     id: 'da-adipose-necklace',
-    title: "Adipose Necklace",
+    title: "Adipose Necklace (test)",
     description: "A little polymer clay adipose necklace.\n\nBased on the BBC show Doctor Who.",
     imageUrl: adiposeNecklace,
     year: "2014",
