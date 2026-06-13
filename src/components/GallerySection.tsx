@@ -118,6 +118,69 @@ const renderDescriptionWithLinks = (text: string) => {
   });
 };
 
+interface LazyImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  isSpecialBg?: boolean;
+}
+
+const LazyImage: React.FC<LazyImageProps> = ({ src, alt, className, isSpecialBg }) => {
+  const [isInView, setIsInView] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: '200px 0px',
+      }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`w-full h-full relative overflow-hidden ${
+        isSpecialBg ? 'bg-[#fefdfe]' : 'bg-stone-50'
+      }`}
+    >
+      {!isLoaded && (
+        <div 
+          className={`absolute inset-0 animate-pulse ${
+            isSpecialBg ? 'bg-[#fefdfe]' : 'bg-purple-50/50'
+          }`} 
+        />
+      )}
+      {isInView && (
+        <img
+          src={src}
+          alt={alt}
+          referrerPolicy="no-referrer"
+          onLoad={() => setIsLoaded(true)}
+          className={`${className} transition-opacity duration-500 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      )}
+    </div>
+  );
+};
+
 export default function GallerySection() {
   const [deviations] = useState<GalleryItem[]>(() => {
     // Fisher-Yates Shuffle to randomize gallery order on load/each time it's seen
@@ -319,20 +382,16 @@ export default function GallerySection() {
                       }}
                     >
                       {/* Photo container */}
-                      <div 
-                        className={`w-full h-full overflow-hidden relative ${isSpecialBg ? '' : 'bg-stone-50'}`}
-                        style={isSpecialBg ? { backgroundColor: '#fefdfe' } : undefined}
-                      >
-                      <img
-                        src={item.imageUrl}
-                        alt={item.altText || item.title}
-                        referrerPolicy="no-referrer"
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                      />
-                      {/* Outer shade gradient for text readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-purple-950/85 via-purple-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350" />
-                    </div>
+                      <div className="w-full h-full overflow-hidden relative">
+                        <LazyImage
+                          src={item.imageUrl}
+                          alt={item.altText || item.title}
+                          isSpecialBg={isSpecialBg}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        />
+                        {/* Outer shade gradient for text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-purple-950/85 via-purple-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350" />
+                      </div>
 
                     {/* Overlaid micro interactions */}
                     <div className="absolute top-3 right-3 flex space-x-1.5 z-10">
