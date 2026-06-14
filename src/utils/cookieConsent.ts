@@ -62,8 +62,8 @@ export function initializeThirdPartyScripts(consent: CookieConsent) {
   const win = window as any;
   win.dataLayer = win.dataLayer || [];
   if (!win.gtag) {
-    win.gtag = function gtag(...args: any[]) {
-      win.dataLayer.push(args);
+    win.gtag = function gtag() {
+      win.dataLayer.push(arguments);
     };
   }
 
@@ -176,10 +176,12 @@ function loadGA4() {
   if (document.getElementById('gtag-js-analytics')) return;
   
   (window as any).dataLayer = (window as any).dataLayer || [];
-  function gtag(...args: any[]) {
-    (window as any).dataLayer.push(args);
+  if (!(window as any).gtag) {
+    (window as any).gtag = function gtag() {
+      (window as any).dataLayer.push(arguments);
+    };
   }
-  (window as any).gtag = gtag as any;
+  const gtag = (window as any).gtag;
   gtag('js', new Date());
   gtag('config', GA_ID, { 'anonymize_ip': true });
 
@@ -195,10 +197,12 @@ function loadGoogleAds() {
   if (document.getElementById('google-ads')) return;
 
   (window as any).dataLayer = (window as any).dataLayer || [];
-  function gtag(...args: any[]) {
-    (window as any).dataLayer.push(args);
+  if (!(window as any).gtag) {
+    (window as any).gtag = function gtag() {
+      (window as any).dataLayer.push(arguments);
+    };
   }
-  (window as any).gtag = gtag as any;
+  const gtag = (window as any).gtag;
   gtag('js', new Date());
   gtag('config', AW_ID);
 

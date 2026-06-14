@@ -133,13 +133,13 @@ export default function CookieConsentBanner({
     localStorage.setItem('thedustyphoenix-terms-accepted', 'true');
     setTermsAccepted(true);
     const nextConsent = saveConsentPreferences({
-      analytics: false,
+      analytics: true,
       marketing: true,
       userOverride: true
     });
     setConsent(nextConsent);
     onConsentChanged(nextConsent);
-    setDraftAnalytics(false);
+    setDraftAnalytics(true);
     setDraftMarketing(true);
     setDraftDoNotSell(false);
     setShowBanner(false);
