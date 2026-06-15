@@ -1,17 +1,37 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google Consent Mode Default Settings -->
+    <!-- Safe Google Consent Mode Defaults & Sync -->
     <script>
       window.dataLayer = window.dataLayer || [];
-      window.gtag = window.gtag || function(){window.dataLayer.push(arguments);};
-      
-      // Set the baseline standard. Default to DENIED based on state/global laws until they interact.
-      window.gtag('consent', 'default', {
-        'analytics_storage': 'denied',
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied'
+      function gtag(){window.dataLayer.push(arguments);}
+      window.gtag = gtag;
+
+      // 1. Synchronously pre-fetch existing consent decisions on page load
+      var savedConsent = null;
+      try {
+        var stored = localStorage.getItem('thedustyphoenix-cookie-consent');
+        var termsAccepted = localStorage.getItem('thedustyphoenix-terms-accepted') === 'true';
+        if (stored && termsAccepted) {
+          savedConsent = JSON.parse(stored);
+        }
+      } catch (e) {
+        // Fail-safe
+      }
+
+      // 2. Map stored state or default to denied for privacy compliance
+      var consentAnalytics = (savedConsent && savedConsent.analytics === true) ? 'granted' : 'denied';
+      var consentMarketing = (savedConsent && savedConsent.marketing === true) ? 'granted' : 'denied';
+
+      // 3. Immediately declare baseline standards before GTM or scripts can run
+      gtag('consent', 'default', {
+        'analytics_storage': consentAnalytics,
+        'ad_storage': consentMarketing,
+        'ad_user_data': consentMarketing,
+        'ad_personalization': consentMarketing,
+        'personalization_storage': consentMarketing,
+        'functionality_storage': 'granted',
+        'security_storage': 'granted'
       });
     </script>
     <!-- Google Tag Manager -->
@@ -23,7 +43,8 @@
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon.png?v=3" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.png?v=3" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>thedustyphoenix | Art, Crafts & Whimsical Creations</title>

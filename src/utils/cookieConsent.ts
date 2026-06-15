@@ -81,7 +81,17 @@ export function initializeThirdPartyScripts(consent: CookieConsent) {
     'analytics_storage': consent.analytics ? 'granted' : 'denied',
     'ad_storage': consent.marketing ? 'granted' : 'denied',
     'ad_user_data': consent.marketing ? 'granted' : 'denied',
-    'ad_personalization': consent.marketing ? 'granted' : 'denied'
+    'ad_personalization': consent.marketing ? 'granted' : 'denied',
+    'personalization_storage': consent.marketing ? 'granted' : 'denied',
+    'functionality_storage': 'granted',
+    'security_storage': 'granted'
+  });
+
+  // 2b. Dispatch a custom dataLayer event to force re-evaluation of non-Consent Mode GTM tags
+  win.dataLayer.push({
+    'event': 'consent_update',
+    'analytics_consent': consent.analytics ? 'granted' : 'denied',
+    'marketing_consent': consent.marketing ? 'granted' : 'denied'
   });
 
   // Track the 'us_privacy_optout' key in localStorage for state privacy laws parity
@@ -130,6 +140,11 @@ function removeScript(id: string) {
     const s = scripts[i];
     const src = s.src || '';
     const text = s.textContent || '';
+    
+    // Safety check - NEVER remove the core GTM script container or elements containing GTM- identifier
+    if (src.includes('GTM-') || text.includes('GTM-')) {
+      continue;
+    }
     
     if (
       (id === 'google-analytics' && (src.includes('googletagmanager.com') && src.includes('G-'))) ||
