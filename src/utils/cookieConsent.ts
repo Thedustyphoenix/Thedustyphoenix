@@ -56,6 +56,88 @@ export function getConsentPreferences(): CookieConsent {
   };
 }
 
+export function updateConsentState(consent: CookieConsent) {
+  if (typeof window === 'undefined') return;
+
+  const win = window as any;
+  win.dataLayer = win.dataLayer || [];
+  if (!win.gtag) {
+    win.gtag = function gtag() {
+      win.dataLayer.push(arguments);
+    };
+  }
+
+  const applyConsentUpdate = () => {
+    // 1. Update the Consent parameters via standard Gtag Consent Mode definition
+    win.gtag('consent', 'update', {
+      'analytics_storage': consent.analytics ? 'granted' : 'denied',
+      'ad_storage': consent.marketing ? 'granted' : 'denied',
+      'ad_user_data': consent.marketing ? 'granted' : 'denied',
+      'ad_personalization': consent.marketing ? 'granted' : 'denied',
+      'personalization_storage': consent.marketing ? 'granted' : 'denied',
+      'functionality_storage': 'granted',
+      'security_storage': 'granted'
+    });
+
+    // 2. Map and update Cloudflare Zaraz consent state if present
+    if (win.zaraz) {
+      try {
+        if (typeof win.zaraz.setConsent === 'function') {
+          win.zaraz.setConsent({
+            'analytics': consent.analytics,
+            'marketing': consent.marketing,
+            'advertising': consent.marketing
+          });
+        }
+        if (win.zaraz.consent && typeof win.zaraz.consent.set === 'function') {
+          win.zaraz.consent.set({
+            'analytics': consent.analytics,
+            'marketing': consent.marketing,
+            'advertising': consent.marketing,
+            'analytics_storage': consent.analytics,
+            'ad_storage': consent.marketing,
+            'ad_user_data': consent.marketing,
+            'ad_personalization': consent.marketing
+          });
+        }
+      } catch (e) {
+        console.warn("Cloudflare Zaraz consent selection propagation failed:", e);
+      }
+    }
+
+    // 3. Dispatch custom dataLayer event to force re-evaluation of non-Consent Mode tags
+    win.dataLayer.push({
+      'event': 'consent_update',
+      'analytics_consent': consent.analytics ? 'granted' : 'denied',
+      'marketing_consent': consent.marketing ? 'granted' : 'denied'
+    });
+  };
+
+  // Run the update immediately for instant local queued execution
+  applyConsentUpdate();
+
+  // As tags like gtag.js/GTM/Zaraz can load asynchronously, we set up a deferred polling update
+  // to ensure the update command gets successfully processed once the libraries are fully active.
+  let checkCount = 0;
+  const maxChecks = 8;
+  const interval = setInterval(() => {
+    checkCount++;
+    const isScriptLoaded = !!(win.google_tag_manager || win.google_tag_data || win.gtag?.fullyLoaded || win.zaraz);
+    if (isScriptLoaded) {
+      applyConsentUpdate();
+      clearInterval(interval);
+    } else if (checkCount >= maxChecks) {
+      applyConsentUpdate(); // Final safe retry fallback
+      clearInterval(interval);
+    }
+  }, 150);
+}
+
+// Expose updateConsentState as a global window API so other integrations can access and call it consistently
+if (typeof window !== 'undefined') {
+  (window as any).updateConsentState = updateConsentState;
+}
+
 export function initializeThirdPartyScripts(consent: CookieConsent) {
   if (typeof window === 'undefined') return;
 
@@ -76,23 +158,8 @@ export function initializeThirdPartyScripts(consent: CookieConsent) {
     win.gtag('set', 'allow_google_signals', true);
   }
 
-  // 2. Now UPDATE the consent parameters
-  win.gtag('consent', 'update', {
-    'analytics_storage': consent.analytics ? 'granted' : 'denied',
-    'ad_storage': consent.marketing ? 'granted' : 'denied',
-    'ad_user_data': consent.marketing ? 'granted' : 'denied',
-    'ad_personalization': consent.marketing ? 'granted' : 'denied',
-    'personalization_storage': consent.marketing ? 'granted' : 'denied',
-    'functionality_storage': 'granted',
-    'security_storage': 'granted'
-  });
-
-  // 2b. Dispatch a custom dataLayer event to force re-evaluation of non-Consent Mode GTM tags
-  win.dataLayer.push({
-    'event': 'consent_update',
-    'analytics_consent': consent.analytics ? 'granted' : 'denied',
-    'marketing_consent': consent.marketing ? 'granted' : 'denied'
-  });
+  // 2. Now UPDATE the consent parameters using our centralized robust API
+  updateConsentState(consent);
 
   // Track the 'us_privacy_optout' key in localStorage for state privacy laws parity
   const optedOut = consent.gpcApplied || (consent.decided && !consent.analytics && !consent.marketing);
