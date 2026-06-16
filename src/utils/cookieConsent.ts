@@ -56,6 +56,27 @@ export function getConsentPreferences(): CookieConsent {
   };
 }
 
+export function getOrCreateUserId(): string {
+  if (typeof window === 'undefined') return '';
+  let userId = localStorage.getItem('thedustyphoenix-user-id');
+  if (!userId) {
+    // Generate a persistent, high-entropy unique identifier
+    try {
+      const array = new Uint32Array(4);
+      if (typeof window.crypto !== 'undefined' && typeof window.crypto.getRandomValues === 'function') {
+        window.crypto.getRandomValues(array);
+        userId = Array.from(array, dec => dec.toString(36)).join('-');
+      } else {
+        userId = 'usr_' + Math.random().toString(36).substring(2, 15) + '-' + Math.random().toString(36).substring(2, 15);
+      }
+    } catch (e) {
+      userId = 'usr_' + Math.random().toString(36).substring(2, 15) + '-' + Math.random().toString(36).substring(2, 15);
+    }
+    localStorage.setItem('thedustyphoenix-user-id', userId);
+  }
+  return userId;
+}
+
 export function updateConsentState(consent: CookieConsent) {
   if (typeof window === 'undefined') return;
 
@@ -68,6 +89,8 @@ export function updateConsentState(consent: CookieConsent) {
   }
 
   const applyConsentUpdate = () => {
+    const userId = getOrCreateUserId();
+
     // 1. Update the Consent parameters via standard Gtag Consent Mode definition
     win.gtag('consent', 'update', {
       'analytics_storage': consent.analytics ? 'granted' : 'denied',
@@ -77,6 +100,12 @@ export function updateConsentState(consent: CookieConsent) {
       'personalization_storage': consent.marketing ? 'granted' : 'denied',
       'functionality_storage': 'granted',
       'security_storage': 'granted'
+    });
+
+    // Push the dynamic user identifier properties directly to the global configuration
+    win.gtag('set', {
+      'user_id': userId,
+      'userId': userId
     });
 
     // 2. Map and update Cloudflare Zaraz consent state if present
@@ -100,6 +129,10 @@ export function updateConsentState(consent: CookieConsent) {
             'ad_personalization': consent.marketing
           });
         }
+        if (typeof win.zaraz.set === 'function') {
+          win.zaraz.set('userId', userId);
+          win.zaraz.set('user_id', userId);
+        }
       } catch (e) {
         console.warn("Cloudflare Zaraz consent selection propagation failed:", e);
       }
@@ -108,6 +141,8 @@ export function updateConsentState(consent: CookieConsent) {
     // 3. Dispatch custom dataLayer event to force re-evaluation of non-Consent Mode tags
     win.dataLayer.push({
       'event': 'consent_update',
+      'userId': userId,
+      'user_id': userId,
       'analytics_consent': consent.analytics ? 'granted' : 'denied',
       'marketing_consent': consent.marketing ? 'granted' : 'denied'
     });
@@ -148,6 +183,17 @@ export function initializeThirdPartyScripts(consent: CookieConsent) {
       win.dataLayer.push(arguments);
     };
   }
+
+  // Pre-expose user ID on dataLayer and gtag configurations prior to triggers
+  const userId = getOrCreateUserId();
+  win.dataLayer.push({
+    'userId': userId,
+    'user_id': userId
+  });
+  win.gtag('set', {
+    'userId': userId,
+    'user_id': userId
+  });
 
   // 1. SET commands MUST run BEFORE update commands!
   if (!consent.marketing) {
@@ -264,8 +310,13 @@ function loadGA4() {
     };
   }
   const gtag = (window as any).gtag;
+  const userId = getOrCreateUserId();
   gtag('js', new Date());
-  gtag('config', GA_ID, { 'anonymize_ip': true });
+  gtag('config', GA_ID, { 
+    'anonymize_ip': true,
+    'user_id': userId,
+    'userId': userId
+  });
 
   const script = document.createElement('script');
   script.id = 'gtag-js-analytics';
@@ -285,8 +336,12 @@ function loadGoogleAds() {
     };
   }
   const gtag = (window as any).gtag;
+  const userId = getOrCreateUserId();
   gtag('js', new Date());
-  gtag('config', AW_ID);
+  gtag('config', AW_ID, {
+    'user_id': userId,
+    'userId': userId
+  });
 
   const script = document.createElement('script');
   script.id = 'google-ads';
