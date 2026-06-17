@@ -179,7 +179,7 @@ export default function TermsOfServicePage({ onBackToHome }: TermsOfServicePageP
               <p className="font-bold text-purple-950">DMCA Designated Agent Contact:</p>
               <p><strong>Entity:</strong> Thedustyphoenix</p>
               <p><strong>Attn:</strong> DMCA Designated Agent</p>
-              <p><strong>Email:</strong> <a href="mailto:thedustyphoenix@gmail.com" className="underline hover:text-purple-950 font-bold">thedustyphoenix@gmail.com</a></p>
+              <p><strong>Email:</strong> <a href="mailto:contact@thedustyphoenix.com" className="underline hover:text-purple-950 font-bold">contact@thedustyphoenix.com</a></p>
             </div>
           </section>
 
@@ -334,7 +334,7 @@ export default function TermsOfServicePage({ onBackToHome }: TermsOfServicePageP
               If you have any questions about these Terms, or if you wish to request written permission for commercial licensing or usage of the Content, please contact us at:
             </p>
             <div className="p-4 bg-purple-50/50 rounded-xl border border-purple-150 text-xs space-y-1">
-              <p><strong>Email Contact:</strong> <a href="mailto:thedustyphoenix@gmail.com" className="underline hover:text-purple-950 font-bold">thedustyphoenix@gmail.com</a></p>
+              <p><strong>Email Contact:</strong> <a href="mailto:contact@thedustyphoenix.com" className="underline hover:text-purple-950 font-bold">contact@thedustyphoenix.com</a></p>
               <p><strong>Website:</strong> <a href="https://www.thedustyphoenix.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-purple-950 font-bold">https://www.thedustyphoenix.com</a></p>
             </div>
           </section>

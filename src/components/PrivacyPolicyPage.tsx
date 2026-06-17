@@ -433,7 +433,7 @@ export default function PrivacyPolicyPage({ onBackToHome }: PrivacyPolicyPagePro
             <div className="p-4 bg-purple-50/50 rounded-xl border border-purple-150 text-xs space-y-1">
               <p><strong>Website Name:</strong> https://www.thedustyphoenix.com</p>
               <p><strong>Contact Name/Owner:</strong> Thedustyphoenix</p>
-              <p><strong>Email Contact:</strong> <a href="mailto:thedustyphoenix@gmail.com?subject=Privacy%20Rights%20Request" className="underline hover:text-purple-950 font-bold">thedustyphoenix@gmail.com</a> (Please use the subject line: "Privacy Rights Request")</p>
+              <p><strong>Email Contact:</strong> <a href="mailto:contact@thedustyphoenix.com?subject=Privacy%20Rights%20Request" className="underline hover:text-purple-950 font-bold">contact@thedustyphoenix.com</a> (Please use the subject line: "Privacy Rights Request")</p>
               <p className="text-purple-700 text-[11px] pt-1 leading-normal">
                 Please note: If you contact us directly via email, we will process your email address and any voluntarily provided contact information solely to respond to your specific inquiry. This contact data is managed strictly separate from our automated web analytics data.
               </p>
